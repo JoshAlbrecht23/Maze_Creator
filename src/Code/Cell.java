@@ -2,10 +2,10 @@ package Code;
 
 public class Cell {
 
-	int X_COORDINATE ; 
-	int Y_COORDINATE ; 
+	private int X_COORDINATE ; 
+	private int Y_COORDINATE ;
 	
-	boolean[] Walls ; 
+	private boolean[] Walls ; 
 	
 	public Cell (int x, int y){
 		
@@ -24,7 +24,20 @@ public class Cell {
 
 	}
 	
+	public void set_left(boolean myBool){
+		Walls[0] = myBool ; 
+	}
 	
+	public void set_up(boolean myBool){
+		Walls[1] = myBool ;
+	}
 	
+	public void set_right(boolean myBool){
+		Walls[3] = myBool ;
+	}
+	
+	public void set_down(boolean myBool){
+		Walls[4] = myBool ;
+	}
 	
 }

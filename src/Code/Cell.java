@@ -33,11 +33,35 @@ public class Cell {
 	}
 	
 	public void set_right(boolean myBool){
-		Walls[3] = myBool ;
+		Walls[2] = myBool ;
 	}
 	
 	public void set_down(boolean myBool){
-		Walls[4] = myBool ;
+		Walls[3] = myBool ;
+	}
+	
+	public boolean get_left(){
+		return Walls[0] ; 
+	}
+	
+	public boolean get_up(){
+		return Walls[1] ;
+	}
+	
+	public boolean get_right(){
+		return Walls[3] ;
+	}
+	
+	public boolean get_down(){
+		return Walls[4] ;
+	}
+	
+	public int get_x(){
+		return X_COORDINATE ; 
+	}
+	
+	public int get_y(){
+		return Y_COORDINATE ; 
 	}
 	
 }

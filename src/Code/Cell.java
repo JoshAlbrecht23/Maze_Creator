@@ -49,11 +49,11 @@ public class Cell {
 	}
 	
 	public boolean get_right(){
-		return Walls[3] ;
+		return Walls[2] ;
 	}
 	
 	public boolean get_down(){
-		return Walls[4] ;
+		return Walls[3] ;
 	}
 	
 	public int get_x(){

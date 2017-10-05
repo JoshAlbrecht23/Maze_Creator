@@ -3,6 +3,7 @@ package Code;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -19,11 +20,15 @@ public class Creator extends JFrame{
 	
 	private static Cell[] cells ; 
 	
+	private Cell DECISION_CELL ;
+	
 	public Creator() {
 	    init();
 	}
 	
 	public void init(){
+		
+		Random rand = new Random();
 		
 		//Initialize window
 		thePanel = new myJpanel() ; 
@@ -47,6 +52,10 @@ public class Creator extends JFrame{
         	}
         } 
        
+        //Pick the starting cell in the first row.
+        int  start_pos = rand.nextInt(GRID_WIDTH_SIZE);        
+        DECISION_CELL = new Cell((start_pos*CELL_WIDTH)+FRAME_BUFFER, FRAME_BUFFER*2 ) ;
+        
         pack();
         repaint();
      
@@ -59,6 +68,7 @@ public class Creator extends JFrame{
     	//Graphics2D g2 = (Graphics2D) g;
     	g.setColor(Color.BLACK);
         
+    	//Draw the Cell border lines.
     	for (int i=0; i<cells.length; i++){
     		Cell myCell = cells[i] ; 
     		
@@ -74,7 +84,11 @@ public class Creator extends JFrame{
 	    	if (myCell.get_up() == true){
 	    		g.drawLine(myCell.get_x(), myCell.get_y(), myCell.get_x()+CELL_WIDTH, myCell.get_y());
 	    	}
-    	}	    	
+    	}
+    	
+    	//Draw current cell
+    	g.setColor(Color.RED);
+    	g.fillRect(DECISION_CELL.get_x(), DECISION_CELL.get_y(), CELL_WIDTH, CELL_WIDTH);
     }
 	
 	

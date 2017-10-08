@@ -3,6 +3,8 @@ package Code;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -21,6 +23,7 @@ public class Creator extends JFrame{
 	private static Cell[] cells ; 
 	
 	private Cell DECISION_CELL ;
+	private Deque<Cell> stack ;
 	
 	public Creator() {
 	    init();
@@ -35,7 +38,10 @@ public class Creator extends JFrame{
 		this.setContentPane(thePanel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
-                
+        
+        //Initialize stack
+        stack = new ArrayDeque<Cell>() ;      
+        
         //Initialize grid of cells
         cells  = new Cell[GRID_WIDTH_SIZE*GRID_HEIGHT_SIZE] ; 
                 
@@ -91,7 +97,14 @@ public class Creator extends JFrame{
     	g.fillRect(DECISION_CELL.get_x(), DECISION_CELL.get_y(), CELL_WIDTH, CELL_WIDTH);
     }
 	
+	private void mark(Cell myCell){
+		
+	}
 	
+	private void neighbors(Cell myCell){
+		
+	}
+   
     public static void main(String[] args) {
 
         java.awt.EventQueue.invokeLater(new Runnable() {

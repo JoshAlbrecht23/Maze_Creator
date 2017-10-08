@@ -6,6 +6,7 @@ public class Cell {
 	private int Y_COORDINATE ;
 	
 	private boolean[] Walls ; 
+	private boolean marked ;
 	
 	public Cell (int x, int y){
 		
@@ -22,8 +23,10 @@ public class Cell {
 		//Down Wall
 		Walls[3] = true ; 
 
+		marked = false ; 
 	}
 	
+	//Set Methods
 	public void set_left(boolean myBool){
 		Walls[0] = myBool ; 
 	}
@@ -40,6 +43,12 @@ public class Cell {
 		Walls[3] = myBool ;
 	}
 	
+	public void set_marked(boolean m){
+		marked = m ;
+	}
+	
+	
+	//Get Methods
 	public boolean get_left(){
 		return Walls[0] ; 
 	}
@@ -62,6 +71,10 @@ public class Cell {
 	
 	public int get_y(){
 		return Y_COORDINATE ; 
+	}
+	
+	public boolean is_marked(){
+		return marked ; 
 	}
 	
 }

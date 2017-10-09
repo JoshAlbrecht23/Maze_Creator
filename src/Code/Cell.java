@@ -7,6 +7,7 @@ public class Cell {
 	
 	private boolean[] Walls ; 
 	private boolean marked ;
+	private boolean frontier_cell ;
 	
 	public Cell (int x, int y){
 		
@@ -24,6 +25,7 @@ public class Cell {
 		Walls[3] = true ; 
 
 		marked = false ; 
+		frontier_cell = false ; 
 	}
 	
 	//Set Methods
@@ -47,6 +49,9 @@ public class Cell {
 		marked = m ;
 	}
 	
+	public void set_frontier(boolean m){
+		frontier_cell = m ; 
+	}
 	
 	//Get Methods
 	public boolean get_left(){
@@ -75,6 +80,10 @@ public class Cell {
 	
 	public boolean is_marked(){
 		return marked ; 
+	}
+	
+	public boolean is_frontier(){
+		return frontier_cell ; 
 	}
 	
 }

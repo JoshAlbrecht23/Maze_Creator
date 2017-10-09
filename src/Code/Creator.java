@@ -69,9 +69,7 @@ public class Creator extends JFrame{
 		
    @Override
     public void paint(Graphics g) {
-    	//super.paint(g);
-    	System.out.println("poop.");
-    	//Graphics2D g2 = (Graphics2D) g;
+	   
     	g.setColor(Color.BLACK);
         
     	//Draw the Cell border lines.
@@ -105,6 +103,37 @@ public class Creator extends JFrame{
 		
 	}
    
+	private void move_cell(Cell origin, Cell destination){
+		//Move the decision cell
+		DECISION_CELL = destination ; 
+		
+		//Mark the destination as part of the maze
+		destination.set_marked(true);
+		
+		//Mark the neighboring cells as frontier cells
+		for (int i=0 ; i< cells.length; i++){
+			//Right
+			if (cells[i].get_x() == destination.get_x() + CELL_WIDTH && cells[i].get_y() == destination.get_y()  && !cells[i].is_frontier()){
+				cells[i].set_frontier(true);
+			}
+			//Left
+			if (cells[i].get_x() == destination.get_x() - CELL_WIDTH && cells[i].get_y() == destination.get_y() && !cells[i].is_frontier()){
+				cells[i].set_frontier(true);
+			}
+			//Down
+			if (cells[i].get_x() == destination.get_x() && cells[i].get_y() == destination.get_y() - CELL_WIDTH && !cells[i].is_frontier()){
+				cells[i].set_frontier(true);
+			}
+			//Up
+			if (cells[i].get_x() == destination.get_x()  && cells[i].get_y()  == destination.get_y() + CELL_WIDTH && !cells[i].is_frontier()){
+				cells[i].set_frontier(true);
+			}
+		}
+		
+		//TODO: Remove the walls between origin and destination.
+		
+	}
+	
     public static void main(String[] args) {
 
         java.awt.EventQueue.invokeLater(new Runnable() {

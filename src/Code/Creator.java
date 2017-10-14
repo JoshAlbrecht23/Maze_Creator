@@ -23,6 +23,7 @@ public class Creator extends JFrame{
 	private static Cell[] cells ; 
 	
 	private Cell DECISION_CELL ;
+	private int CURRENT_CELL_INDEX ;
 	private Deque<Cell> stack ;
 	
 	public Creator() {
@@ -60,7 +61,8 @@ public class Creator extends JFrame{
        
         //Pick the starting cell in the first row.
         int  start_pos = rand.nextInt(GRID_WIDTH_SIZE);        
-        DECISION_CELL = new Cell((start_pos*CELL_WIDTH)+FRAME_BUFFER, FRAME_BUFFER*2 ) ;
+        DECISION_CELL = cells[start_pos] ;
+        CURRENT_CELL_INDEX = start_pos ;
         
         pack();
         repaint();
@@ -96,14 +98,21 @@ public class Creator extends JFrame{
     }
 	
 	private void mark(Cell myCell){
-		
+		myCell.set_marked(true) ;
+		neighbors(myCell) ; 
 	}
 	
 	private void neighbors(Cell myCell){
+		//TODO: Mark the bottom neighbor.
 		
+		//TODO: Mark the left neighbor.
+		
+		//TODO: Mark the right neighbor.
+		
+		//TODO: Mark the top neighbor.
 	}
    
-	private void move_cell(Cell origin, Cell destination){
+	private void move_cell(Cell origin, Cell destination, Direction OriginWall, Direction DestinationWall ){
 		//Move the decision cell
 		DECISION_CELL = destination ; 
 		
@@ -130,7 +139,29 @@ public class Creator extends JFrame{
 			}
 		}
 		
-		//TODO: Remove the walls between origin and destination.
+		//Toggle origin cell wall.
+		if ( OriginWall == Direction.Left ){
+			origin.set_left(false);
+		}else if ( OriginWall == Direction.Right ){
+			origin.set_right(false);
+		}else if ( OriginWall == Direction.Up ){
+			origin.set_up(false);
+		}else if ( OriginWall == Direction.Down ){
+			origin.set_down(false);
+		}
+		//Toggle destination cell wall.
+		if ( DestinationWall == Direction.Left ){
+			destination.set_left(false);
+		}else if ( DestinationWall == Direction.Right ){
+			destination.set_right(false);
+		}else if ( DestinationWall == Direction.Up ){
+			destination.set_up(false);
+		}else if ( DestinationWall == Direction.Down ){
+			destination.set_down(false);
+		}
+		
+		mark(destination) ;
+		repaint();
 		
 	}
 	
@@ -152,6 +183,11 @@ public class Creator extends JFrame{
     	}
     	
     }
+    
+    public enum Direction{
+    	Left, Right, Down, Up
+    }
+    
 }
 
 

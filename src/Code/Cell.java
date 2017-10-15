@@ -5,6 +5,9 @@ public class Cell {
 	private int X_COORDINATE ; 
 	private int Y_COORDINATE ;
 	
+	private int x ; 
+	private int y ;
+	
 	private boolean[] Walls ; 
 	private boolean marked ;
 	private boolean frontier_cell ;
@@ -47,10 +50,19 @@ public class Cell {
 	
 	public void set_marked(boolean m){
 		marked = m ;
+		frontier_cell = false ;
 	}
 	
 	public void set_frontier(boolean m){
 		frontier_cell = m ; 
+	}
+	
+	public void set_x(int m){
+		x = m;
+	}
+	
+	public void set_y(int m){
+		y = m ;
 	}
 	
 	//Get Methods
@@ -70,12 +82,20 @@ public class Cell {
 		return Walls[3] ;
 	}
 	
-	public int get_x(){
+	public int get_x_coordinate(){
 		return X_COORDINATE ; 
 	}
 	
-	public int get_y(){
+	public int get_y_coordinate(){
 		return Y_COORDINATE ; 
+	}
+	
+	public int get_x(){
+		return x ;
+	}
+	
+	public int get_y(){
+		return y ; 
 	}
 	
 	public boolean is_marked(){

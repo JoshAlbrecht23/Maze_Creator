@@ -3,7 +3,9 @@ package Code;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.List;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Random;
 
@@ -20,10 +22,13 @@ public class Creator extends JFrame{
 	
 	private static int FRAME_BUFFER = 20 ; 
 	
-	private static Cell[] cells ; 
+	private static Cell[][] cells ; 
 	
 	private Cell DECISION_CELL ;
-	private int CURRENT_CELL_INDEX ;
+	//Coordinates for decision cell.
+	private int CURRENT_X ;
+	private int CURRENT_Y ;
+
 	private Deque<Cell> stack ;
 	
 	public Creator() {
@@ -44,25 +49,25 @@ public class Creator extends JFrame{
         stack = new ArrayDeque<Cell>() ;      
         
         //Initialize grid of cells
-        cells  = new Cell[GRID_WIDTH_SIZE*GRID_HEIGHT_SIZE] ; 
+        cells  = new Cell[GRID_WIDTH_SIZE][GRID_HEIGHT_SIZE] ; 
                 
-        int count = 0 ; 
         for (int i=0 ; i < GRID_HEIGHT_SIZE ; i++ ){
         	for (int j=0 ; j < GRID_WIDTH_SIZE ; j++ ){
-        		cells[count] = new Cell((j*CELL_WIDTH)+FRAME_BUFFER, (i*CELL_WIDTH)+FRAME_BUFFER*2) ;        		
-        		cells[count].set_down(true) ;
-        		cells[count].set_left(true) ;
-        		cells[count].set_right(true) ;
-        		cells[count].set_up(true) ;
-        		        		        		
-        		count++ ;
+        		cells[i][j] = new Cell((i*CELL_WIDTH)+FRAME_BUFFER, (j*CELL_WIDTH)+FRAME_BUFFER*2) ;        		
+        		cells[i][j].set_down(true) ;
+        		cells[i][j].set_left(true) ;
+        		cells[i][j].set_right(true) ;
+        		cells[i][j].set_up(true) ;
+        		cells[i][j].set_x(i);
+        		cells[i][j].set_y(j);
         	}
         } 
        
         //Pick the starting cell in the first row.
         int  start_pos = rand.nextInt(GRID_WIDTH_SIZE);        
-        DECISION_CELL = cells[start_pos] ;
-        CURRENT_CELL_INDEX = start_pos ;
+        DECISION_CELL = cells[start_pos][0] ;
+        CURRENT_X = start_pos ;
+        CURRENT_Y = 0 ;
         
         pack();
         repaint();
@@ -76,91 +81,92 @@ public class Creator extends JFrame{
         
     	//Draw the Cell border lines.
     	for (int i=0; i<cells.length; i++){
-    		Cell myCell = cells[i] ; 
+    		for (int j=0; j<cells.length; j++){
+    			Cell myCell = cells[i][j] ; 
     		
-    		if (myCell.get_down() == true){
-	    		g.drawLine(myCell.get_x(), myCell.get_y() + CELL_WIDTH, myCell.get_x() + CELL_WIDTH, myCell.get_y() + CELL_WIDTH);
-	    	}
-	    	if (myCell.get_left() == true){
-	    		g.drawLine(myCell.get_x(), myCell.get_y(), myCell.get_x(), myCell.get_y() + CELL_WIDTH);
-	    	}
-	    	if (myCell.get_right() == true){
-	    		g.drawLine(myCell.get_x()+CELL_WIDTH, myCell.get_y(), myCell.get_x()+CELL_WIDTH, myCell.get_y() + CELL_WIDTH);
-	    	}
-	    	if (myCell.get_up() == true){
-	    		g.drawLine(myCell.get_x(), myCell.get_y(), myCell.get_x()+CELL_WIDTH, myCell.get_y());
-	    	}
+	    		if (myCell.get_down() == true){
+		    		g.drawLine(myCell.get_x_coordinate(), myCell.get_y_coordinate() + CELL_WIDTH, myCell.get_x_coordinate() + CELL_WIDTH, myCell.get_y_coordinate() + CELL_WIDTH);
+		    	}
+		    	if (myCell.get_left() == true){
+		    		g.drawLine(myCell.get_x_coordinate(), myCell.get_y_coordinate(), myCell.get_x_coordinate(), myCell.get_y_coordinate() + CELL_WIDTH);
+		    	}
+		    	if (myCell.get_right() == true){
+		    		g.drawLine(myCell.get_x_coordinate()+CELL_WIDTH, myCell.get_y_coordinate(), myCell.get_x_coordinate()+CELL_WIDTH, myCell.get_y_coordinate() + CELL_WIDTH);
+		    	}
+		    	if (myCell.get_up() == true){
+		    		g.drawLine(myCell.get_x_coordinate(), myCell.get_y_coordinate(), myCell.get_x_coordinate()+CELL_WIDTH, myCell.get_y_coordinate());
+		    	}
+    		}	
     	}
     	
     	//Draw current cell
     	g.setColor(Color.RED);
-    	g.fillRect(DECISION_CELL.get_x(), DECISION_CELL.get_y(), CELL_WIDTH, CELL_WIDTH);
+    	g.fillRect(DECISION_CELL.get_x_coordinate(), DECISION_CELL.get_y_coordinate(), CELL_WIDTH, CELL_WIDTH);
     }
 	
-	private void mark(Cell myCell){
-		myCell.set_marked(true) ;
-		neighbors(myCell) ; 
-	}
-	
-	private void neighbors(Cell myCell){
-		//TODO: Mark the bottom neighbor.
+   	private void pick_frontier_cell(){
+   		
+   		ArrayList<Cell> front_cells = new ArrayList<Cell>(); 
+   		
+   		for (int i=0; i<GRID_WIDTH_SIZE; i++){
+   			for (int j=0; j<GRID_HEIGHT_SIZE; j++){
+   				if ( cells[i][j].is_frontier() )
+   					front_cells.add(cells[i][j]);
+   			}
+   		}
 		
-		//TODO: Mark the left neighbor.
-		
-		//TODO: Mark the right neighbor.
-		
-		//TODO: Mark the top neighbor.
-	}
+   		Random rand = new Random();
+   		int  rand_pick = rand.nextInt(front_cells.size());
+   		
+   		
+   	}
    
-	private void move_cell(Cell origin, Cell destination, Direction OriginWall, Direction DestinationWall ){
+	private void move_cell(int origin_x, int origin_y,int destination_x, int destination_y , Direction OriginWall, Direction DestinationWall ){
 		//Move the decision cell
-		DECISION_CELL = destination ; 
+		DECISION_CELL = cells[destination_x][destination_y] ; 
 		
 		//Mark the destination as part of the maze
-		destination.set_marked(true);
+		DECISION_CELL.set_marked(true);
 		
-		//Mark the neighboring cells as frontier cells
-		for (int i=0 ; i< cells.length; i++){
-			//Right
-			if (cells[i].get_x() == destination.get_x() + CELL_WIDTH && cells[i].get_y() == destination.get_y()  && !cells[i].is_frontier()){
-				cells[i].set_frontier(true);
-			}
-			//Left
-			if (cells[i].get_x() == destination.get_x() - CELL_WIDTH && cells[i].get_y() == destination.get_y() && !cells[i].is_frontier()){
-				cells[i].set_frontier(true);
-			}
-			//Down
-			if (cells[i].get_x() == destination.get_x() && cells[i].get_y() == destination.get_y() - CELL_WIDTH && !cells[i].is_frontier()){
-				cells[i].set_frontier(true);
-			}
-			//Up
-			if (cells[i].get_x() == destination.get_x()  && cells[i].get_y()  == destination.get_y() + CELL_WIDTH && !cells[i].is_frontier()){
-				cells[i].set_frontier(true);
-			}
+		//Mark the neighbor cells.
+		//Right 
+		if ( destination_x != GRID_WIDTH_SIZE ){
+			cells[destination_x + 1][destination_y].set_frontier(true);;
+		}
+		//Left
+		if ( destination_x != 0 ){
+			cells[destination_x - 1][destination_y].set_frontier(true);;
+		}
+		//Down
+		if ( destination_y != GRID_HEIGHT_SIZE){
+			cells[destination_x][destination_y + 1].set_frontier(true);;
+		}
+		//Up
+		if ( destination_y !=  0){
+			cells[destination_x][destination_y - 1].set_frontier(true);;
 		}
 		
 		//Toggle origin cell wall.
 		if ( OriginWall == Direction.Left ){
-			origin.set_left(false);
+			cells[origin_x][origin_y].set_left(false);
 		}else if ( OriginWall == Direction.Right ){
-			origin.set_right(false);
+			cells[origin_x][origin_y].set_right(false);
 		}else if ( OriginWall == Direction.Up ){
-			origin.set_up(false);
+			cells[origin_x][origin_y].set_up(false);
 		}else if ( OriginWall == Direction.Down ){
-			origin.set_down(false);
+			cells[origin_x][origin_y].set_down(false);
 		}
 		//Toggle destination cell wall.
 		if ( DestinationWall == Direction.Left ){
-			destination.set_left(false);
+			cells[destination_x][destination_y].set_left(false);
 		}else if ( DestinationWall == Direction.Right ){
-			destination.set_right(false);
+			cells[destination_x][destination_y].set_right(false);
 		}else if ( DestinationWall == Direction.Up ){
-			destination.set_up(false);
+			cells[destination_x][destination_y].set_up(false);
 		}else if ( DestinationWall == Direction.Down ){
-			destination.set_down(false);
+			cells[destination_x][destination_y].set_down(false);
 		}
 		
-		mark(destination) ;
 		repaint();
 		
 	}

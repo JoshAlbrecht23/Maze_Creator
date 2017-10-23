@@ -17,22 +17,25 @@ public class Creator extends JFrame{
     private myJpanel thePanel;
 	
 	private static int CELL_WIDTH = 50 ;
-	private static int GRID_WIDTH_SIZE = 9 ; 
-	private static int GRID_HEIGHT_SIZE = 9 ; 	
+	private static int GRID_WIDTH_SIZE = 10 ; 
+	private static int GRID_HEIGHT_SIZE = 10 ; 	
 	
 	private static int FRAME_BUFFER = 20 ; 
 	
 	private static Cell[][] cells ; 
 	
 	private Cell DECISION_CELL ;
-	//Coordinates for decision cell.
-	private int CURRENT_X ;
-	private int CURRENT_Y ;
 
 	private Deque<Cell> stack ;
 	
 	public Creator() {
 	    init();
+        
+	    //Run algorithm.    
+	    while (is_unvisited_cells()){
+        	pick_frontier_cell();
+        	repaint();
+        }
 	}
 	
 	public void init(){
@@ -66,17 +69,16 @@ public class Creator extends JFrame{
         //Pick the starting cell in the first row.
         int  start_pos = rand.nextInt(GRID_WIDTH_SIZE);        
         DECISION_CELL = cells[start_pos][0] ;
-        CURRENT_X = start_pos ;
-        CURRENT_Y = 0 ;
+        cells[start_pos][0].set_marked(true);
         
         pack();
         repaint();
-     
+             
 	}
 		
    @Override
     public void paint(Graphics g) {
-	   
+	   	   
     	g.setColor(Color.BLACK);
         
     	//Draw the Cell border lines.
@@ -105,72 +107,93 @@ public class Creator extends JFrame{
     }
 	
    	private void pick_frontier_cell(){
-   		
+   		   		
    		ArrayList<Cell> front_cells = new ArrayList<Cell>(); 
+   		
+   		//Add current cell's neighbors
+   		//Right
+   		if (DECISION_CELL.get_x() != GRID_WIDTH_SIZE - 1 ){
+   			if (cells[DECISION_CELL.get_x() + 1][DECISION_CELL.get_y()].is_marked() == false){
+   	   			front_cells.add(cells[DECISION_CELL.get_x() + 1][DECISION_CELL.get_y()]);
+   			}
+   		}
+   		//Left
+   		if (DECISION_CELL.get_x() != 0 ){
+   			if (cells[DECISION_CELL.get_x() - 1][DECISION_CELL.get_y()].is_marked() == false){
+   	   			front_cells.add(cells[DECISION_CELL.get_x() - 1][DECISION_CELL.get_y()]);
+   			}
+   		}
+   		//Down
+   		if (DECISION_CELL.get_y() != GRID_HEIGHT_SIZE - 1 ){
+   			if (cells[DECISION_CELL.get_x()][DECISION_CELL.get_y() + 1].is_marked() == false){
+   	   			front_cells.add(cells[DECISION_CELL.get_x()][DECISION_CELL.get_y() + 1]);
+   			}
+   		}
+   		//Up
+   		if (DECISION_CELL.get_y() != 0 ){
+   			if (cells[DECISION_CELL.get_x()][DECISION_CELL.get_y() - 1].is_marked() == false){
+   	   			front_cells.add(cells[DECISION_CELL.get_x()][DECISION_CELL.get_y() - 1]);
+   			}
+   		}
+   		  		
+   		if (front_cells.isEmpty() == false){
+   	   		//Push current cell to the stack
+   	   		stack.push(DECISION_CELL);
+   			
+   			//Randomly choose a neighbor
+   	   		Random rand = new Random();
+   	   		int  rand_pick = rand.nextInt(front_cells.size());
+   	   		
+   	   		Cell rand_front_cell = front_cells.get(rand_pick) ; 
+   	   		
+   	   		//Remove the wall between the choosen cell and the current cell.
+   	   		//Right
+   	   		if (DECISION_CELL.get_x() + 1 == rand_front_cell.get_x() && DECISION_CELL.get_y() == rand_front_cell.get_y()){
+   	   			
+   	   			cells[DECISION_CELL.get_x()][DECISION_CELL.get_y()].set_right(false);
+   	   			cells[rand_front_cell.get_x()][rand_front_cell.get_y()].set_left(false);
+   			
+   	   		//Left	
+   	   		}else if (DECISION_CELL.get_x() - 1 == rand_front_cell.get_x() && DECISION_CELL.get_y() == rand_front_cell.get_y()){
+   	   			cells[DECISION_CELL.get_x()][DECISION_CELL.get_y()].set_left(false);
+   	   			cells[rand_front_cell.get_x()][rand_front_cell.get_y()].set_right(false);
+   	   			
+   	   		//Down	
+   	   		}else if (DECISION_CELL.get_x() == rand_front_cell.get_x() && DECISION_CELL.get_y() + 1 == rand_front_cell.get_y()){
+   	   			
+   	   			cells[DECISION_CELL.get_x()][DECISION_CELL.get_y()].set_down(false);
+   	   			cells[rand_front_cell.get_x()][rand_front_cell.get_y()].set_up(false);
+   	   			
+   	   		//Up
+   	   		}else{
+   	   			cells[DECISION_CELL.get_x()][DECISION_CELL.get_y()].set_up(false);
+   	   			cells[rand_front_cell.get_x()][rand_front_cell.get_y()].set_down(false);
+   	   			
+   	   		}
+   	   		
+   	   		cells[rand_front_cell.get_x()][rand_front_cell.get_y()].set_marked(true);
+   	   		//rand_front_cell.set_marked(true);
+   	   		DECISION_CELL = rand_front_cell ;
+   		}else{
+   			if (stack.isEmpty() == false){
+   	   			DECISION_CELL = stack.pop() ;
+   			}
+   		}
+   	}
+   
+   	private boolean is_unvisited_cells(){
+   		boolean b = false;
    		
    		for (int i=0; i<GRID_WIDTH_SIZE; i++){
    			for (int j=0; j<GRID_HEIGHT_SIZE; j++){
-   				if ( cells[i][j].is_frontier() )
-   					front_cells.add(cells[i][j]);
+   				if ( cells[i][j].is_marked() == false)
+   					return true ; 
    			}
    		}
-		
-   		Random rand = new Random();
-   		int  rand_pick = rand.nextInt(front_cells.size());
    		
-   		
+   		return b ;
    	}
-   
-	private void move_cell(int origin_x, int origin_y,int destination_x, int destination_y , Direction OriginWall, Direction DestinationWall ){
-		//Move the decision cell
-		DECISION_CELL = cells[destination_x][destination_y] ; 
-		
-		//Mark the destination as part of the maze
-		DECISION_CELL.set_marked(true);
-		
-		//Mark the neighbor cells.
-		//Right 
-		if ( destination_x != GRID_WIDTH_SIZE ){
-			cells[destination_x + 1][destination_y].set_frontier(true);;
-		}
-		//Left
-		if ( destination_x != 0 ){
-			cells[destination_x - 1][destination_y].set_frontier(true);;
-		}
-		//Down
-		if ( destination_y != GRID_HEIGHT_SIZE){
-			cells[destination_x][destination_y + 1].set_frontier(true);;
-		}
-		//Up
-		if ( destination_y !=  0){
-			cells[destination_x][destination_y - 1].set_frontier(true);;
-		}
-		
-		//Toggle origin cell wall.
-		if ( OriginWall == Direction.Left ){
-			cells[origin_x][origin_y].set_left(false);
-		}else if ( OriginWall == Direction.Right ){
-			cells[origin_x][origin_y].set_right(false);
-		}else if ( OriginWall == Direction.Up ){
-			cells[origin_x][origin_y].set_up(false);
-		}else if ( OriginWall == Direction.Down ){
-			cells[origin_x][origin_y].set_down(false);
-		}
-		//Toggle destination cell wall.
-		if ( DestinationWall == Direction.Left ){
-			cells[destination_x][destination_y].set_left(false);
-		}else if ( DestinationWall == Direction.Right ){
-			cells[destination_x][destination_y].set_right(false);
-		}else if ( DestinationWall == Direction.Up ){
-			cells[destination_x][destination_y].set_up(false);
-		}else if ( DestinationWall == Direction.Down ){
-			cells[destination_x][destination_y].set_down(false);
-		}
-		
-		repaint();
-		
-	}
-	
+ 	
     public static void main(String[] args) {
 
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -180,6 +203,8 @@ public class Creator extends JFrame{
             }
             
         });
+        
+
     } 
 
     class myJpanel extends JPanel {
@@ -189,11 +214,6 @@ public class Creator extends JFrame{
     	}
     	
     }
-    
-    public enum Direction{
-    	Left, Right, Down, Up
-    }
-    
 }
 
 

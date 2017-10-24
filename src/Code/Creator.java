@@ -25,6 +25,8 @@ public class Creator extends JFrame{
 	private static Cell[][] cells ; 
 	
 	private Cell DECISION_CELL ;
+	private Cell START_CELL ; 
+	private Cell END_CELL ;
 
 	private Deque<Cell> stack ;
 	
@@ -36,6 +38,10 @@ public class Creator extends JFrame{
         	pick_frontier_cell();
         	repaint();
         }
+	    
+	    //Set the End Cell
+	    END_CELL = new Cell (DECISION_CELL.get_x_coordinate(), DECISION_CELL.get_y_coordinate()) ;
+	    DECISION_CELL = null ;
 	}
 	
 	public void init(){
@@ -71,6 +77,9 @@ public class Creator extends JFrame{
         DECISION_CELL = cells[start_pos][0] ;
         cells[start_pos][0].set_marked(true);
         
+        //Init Start Cell
+        START_CELL = new Cell(DECISION_CELL.get_x_coordinate(),DECISION_CELL.get_y_coordinate());
+        
         pack();
         repaint();
              
@@ -102,8 +111,23 @@ public class Creator extends JFrame{
     	}
     	
     	//Draw current cell
-    	g.setColor(Color.RED);
-    	g.fillRect(DECISION_CELL.get_x_coordinate(), DECISION_CELL.get_y_coordinate(), CELL_WIDTH, CELL_WIDTH);
+    	if (DECISION_CELL != null){
+    		g.setColor(Color.RED);
+        	g.fillRect(DECISION_CELL.get_x_coordinate(), DECISION_CELL.get_y_coordinate(), CELL_WIDTH, CELL_WIDTH);
+    	}
+    		
+    	//Draw Start
+    	g.setColor(Color.BLUE);
+    	
+    	int reduced_width = (int) ((int) CELL_WIDTH - (CELL_WIDTH*.10)) ;
+    	if( START_CELL != null ){
+        	g.fillRect(START_CELL.get_x_coordinate() + 2, START_CELL.get_y_coordinate() + 2, reduced_width , reduced_width) ;
+    	}
+    	
+    	//Draw End
+    	if( END_CELL != null ){
+        	g.fillRect(END_CELL.get_x_coordinate() + 2, END_CELL.get_y_coordinate() + 2, reduced_width, reduced_width);
+    	}
     }
 	
    	private void pick_frontier_cell(){

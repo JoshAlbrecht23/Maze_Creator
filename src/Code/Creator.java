@@ -1,5 +1,6 @@
 package Code;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -11,15 +12,20 @@ import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 public class Creator extends JFrame{
 
-    private myJpanel thePanel;
+    private myJpanel thePanel ;
+    private JScrollPane myJSP ;
 	
 	private static int CELL_WIDTH = 50 ;
 	private static int GRID_WIDTH_SIZE = 10 ; 
 	private static int GRID_HEIGHT_SIZE = 10 ; 	
 	
+	private static int PANEL_WIDTH = 500 ;
+	private static int PANEL_HEIGHT = 500 ;
+
 	private static int FRAME_BUFFER = 20 ; 
 	
 	private static Cell[][] cells ; 
@@ -50,10 +56,19 @@ public class Creator extends JFrame{
 		
 		//Initialize window
 		thePanel = new myJpanel() ; 
-		this.setContentPane(thePanel);
+
+		myJSP = new JScrollPane(thePanel) ;
+		myJSP.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		myJSP.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+				
+		//this.setContentPane(thePanel);
+		this.getContentPane().add(myJSP, BorderLayout.CENTER);
+		this.add(myJSP) ; 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setTitle("Maze Creator");
+        this.setResizable(false);
         this.setVisible(true);
-        
+       
         //Initialize stack
         stack = new ArrayDeque<Cell>() ;      
         
@@ -234,7 +249,8 @@ public class Creator extends JFrame{
     class myJpanel extends JPanel {
 
     	public myJpanel(){
-    		setPreferredSize(new Dimension((GRID_WIDTH_SIZE * CELL_WIDTH) + FRAME_BUFFER*2, (GRID_HEIGHT_SIZE * CELL_WIDTH) + FRAME_BUFFER*2));
+    		//setPreferredSize(new Dimension((GRID_WIDTH_SIZE * CELL_WIDTH) + FRAME_BUFFER*2, (GRID_HEIGHT_SIZE * CELL_WIDTH) + FRAME_BUFFER*2));
+    		setPreferredSize(new Dimension(PANEL_WIDTH,PANEL_HEIGHT));
     	}
     	
     }

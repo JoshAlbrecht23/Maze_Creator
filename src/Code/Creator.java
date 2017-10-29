@@ -1,10 +1,10 @@
 package Code;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -13,8 +13,10 @@ import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.Timer;
 
-public class Creator extends JFrame{
+
+public class Creator extends JFrame implements ActionListener{
 
     private myJpanel thePanel ;
     private JScrollPane myJSP ;
@@ -33,41 +35,28 @@ public class Creator extends JFrame{
 	private Cell DECISION_CELL ;
 	private Cell START_CELL ; 
 	private Cell END_CELL ;
-
+	
 	private Deque<Cell> stack ;
+
+	private Timer myTimer ;
 	
 	public Creator() {
 	    init();
-        
-	    //Run algorithm.    
-	    while (is_unvisited_cells()){
-        	pick_frontier_cell();
-        	repaint();
-        }
-	    
-	    //Set the End Cell
-	    END_CELL = new Cell (DECISION_CELL.get_x_coordinate(), DECISION_CELL.get_y_coordinate()) ;
-	    DECISION_CELL = null ;
 	}
-	
+		
 	public void init(){
 		
 		Random rand = new Random();
-		
+			
 		//Initialize window
 		thePanel = new myJpanel() ; 
 
-		myJSP = new JScrollPane(thePanel) ;
-		myJSP.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		myJSP.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-				
-		//this.setContentPane(thePanel);
-		this.getContentPane().add(myJSP, BorderLayout.CENTER);
-		this.add(myJSP) ; 
+		this.add(thePanel) ; 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Maze Creator");
-        this.setResizable(false);
+        this.setResizable(true);
         this.setVisible(true);
+        this.setLocationRelativeTo(null);
        
         //Initialize stack
         stack = new ArrayDeque<Cell>() ;      
@@ -94,22 +83,31 @@ public class Creator extends JFrame{
         
         //Init Start Cell
         START_CELL = new Cell(DECISION_CELL.get_x_coordinate(),DECISION_CELL.get_y_coordinate());
-        
+             
         pack();
         repaint();
+        
+    	myTimer = new Timer (500, this) ;
+        myTimer.start();
              
 	}
 		
    @Override
     public void paint(Graphics g) {
 	   	   
-    	g.setColor(Color.BLACK);
         
     	//Draw the Cell border lines.
     	for (int i=0; i<cells.length; i++){
     		for (int j=0; j<cells.length; j++){
     			Cell myCell = cells[i][j] ; 
     		
+    			//Fill rectangle with white/
+    			g.setColor(Color.WHITE);
+    			g.fillRect(myCell.get_x_coordinate(), myCell.get_y_coordinate(), CELL_WIDTH, CELL_WIDTH);
+    			
+    			//Draw cell borders
+    	    	g.setColor(Color.BLACK);
+    			
 	    		if (myCell.get_down() == true){
 		    		g.drawLine(myCell.get_x_coordinate(), myCell.get_y_coordinate() + CELL_WIDTH, myCell.get_x_coordinate() + CELL_WIDTH, myCell.get_y_coordinate() + CELL_WIDTH);
 		    	}
@@ -145,6 +143,19 @@ public class Creator extends JFrame{
     	}
     }
 	
+ 	public void actionPerformed(ActionEvent ev){
+ 		if(ev.getSource()==myTimer){
+ 			if (is_unvisited_cells()){
+ 				pick_frontier_cell();
+ 				repaint();
+ 			}else{
+ 				myTimer.stop();
+ 			    END_CELL = new Cell (DECISION_CELL.get_x_coordinate(), DECISION_CELL.get_y_coordinate()) ;
+ 			    DECISION_CELL = null ;
+ 			}
+ 		}
+ 	} 
+   
    	private void pick_frontier_cell(){
    		   		
    		ArrayList<Cell> front_cells = new ArrayList<Cell>(); 
@@ -246,12 +257,11 @@ public class Creator extends JFrame{
 
     } 
 
-    class myJpanel extends JPanel {
-
+    class myJpanel extends JPanel  {
+    	
     	public myJpanel(){
-    		//setPreferredSize(new Dimension((GRID_WIDTH_SIZE * CELL_WIDTH) + FRAME_BUFFER*2, (GRID_HEIGHT_SIZE * CELL_WIDTH) + FRAME_BUFFER*2));
-    		setPreferredSize(new Dimension(PANEL_WIDTH,PANEL_HEIGHT));
-    	}
+    		setPreferredSize(new Dimension((GRID_WIDTH_SIZE * CELL_WIDTH) + FRAME_BUFFER*2, (GRID_HEIGHT_SIZE * CELL_WIDTH) + FRAME_BUFFER*2));
+    	} 
     	
     }
 }

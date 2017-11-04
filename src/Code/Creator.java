@@ -19,17 +19,13 @@ import javax.swing.Timer;
 public class Creator extends JFrame implements ActionListener{
 
     private myJpanel thePanel ;
-    private JScrollPane myJSP ;
 	
 	private static int CELL_WIDTH = 50 ;
 	private static int GRID_WIDTH_SIZE = 10 ; 
 	private static int GRID_HEIGHT_SIZE = 10 ; 	
 	
-	private static int PANEL_WIDTH = 500 ;
-	private static int PANEL_HEIGHT = 500 ;
-
 	private static int FRAME_BUFFER = 20 ; 
-	
+
 	private static Cell[][] cells ; 
 	
 	private Cell DECISION_CELL ;
@@ -50,7 +46,7 @@ public class Creator extends JFrame implements ActionListener{
 			
 		//Initialize window
 		thePanel = new myJpanel() ; 
-
+		
 		this.add(thePanel) ; 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Maze Creator");
@@ -63,7 +59,7 @@ public class Creator extends JFrame implements ActionListener{
         
         //Initialize grid of cells
         cells  = new Cell[GRID_WIDTH_SIZE][GRID_HEIGHT_SIZE] ; 
-                
+        //Create cells    
         for (int i=0 ; i < GRID_HEIGHT_SIZE ; i++ ){
         	for (int j=0 ; j < GRID_WIDTH_SIZE ; j++ ){
         		cells[i][j] = new Cell((i*CELL_WIDTH)+FRAME_BUFFER, (j*CELL_WIDTH)+FRAME_BUFFER*2) ;        		
@@ -82,8 +78,8 @@ public class Creator extends JFrame implements ActionListener{
         cells[start_pos][0].set_marked(true);
         
         //Init Start Cell
-        START_CELL = new Cell(DECISION_CELL.get_x_coordinate(),DECISION_CELL.get_y_coordinate());
-             
+        START_CELL = new Cell(DECISION_CELL.get_x_coordinate(),DECISION_CELL.get_y_coordinate());  
+                
         pack();
         repaint();
         
@@ -141,6 +137,7 @@ public class Creator extends JFrame implements ActionListener{
     	if( END_CELL != null ){
         	g.fillRect(END_CELL.get_x_coordinate() + 2, END_CELL.get_y_coordinate() + 2, reduced_width, reduced_width);
     	}
+    	
     }
 	
  	public void actionPerformed(ActionEvent ev){
@@ -159,7 +156,7 @@ public class Creator extends JFrame implements ActionListener{
    	private void pick_frontier_cell(){
    		   		
    		ArrayList<Cell> front_cells = new ArrayList<Cell>(); 
-   		
+   			
    		//Add current cell's neighbors
    		//Right
    		if (DECISION_CELL.get_x() != GRID_WIDTH_SIZE - 1 ){
@@ -196,39 +193,35 @@ public class Creator extends JFrame implements ActionListener{
    	   		
    	   		Cell rand_front_cell = front_cells.get(rand_pick) ; 
    	   		
-   	   		//Remove the wall between the choosen cell and the current cell.
+   	   		//Remove the wall between the chosen cell and the current cell.
    	   		//Right
    	   		if (DECISION_CELL.get_x() + 1 == rand_front_cell.get_x() && DECISION_CELL.get_y() == rand_front_cell.get_y()){
-   	   			
    	   			cells[DECISION_CELL.get_x()][DECISION_CELL.get_y()].set_right(false);
    	   			cells[rand_front_cell.get_x()][rand_front_cell.get_y()].set_left(false);
-   			
    	   		//Left	
    	   		}else if (DECISION_CELL.get_x() - 1 == rand_front_cell.get_x() && DECISION_CELL.get_y() == rand_front_cell.get_y()){
    	   			cells[DECISION_CELL.get_x()][DECISION_CELL.get_y()].set_left(false);
    	   			cells[rand_front_cell.get_x()][rand_front_cell.get_y()].set_right(false);
-   	   			
    	   		//Down	
    	   		}else if (DECISION_CELL.get_x() == rand_front_cell.get_x() && DECISION_CELL.get_y() + 1 == rand_front_cell.get_y()){
-   	   			
    	   			cells[DECISION_CELL.get_x()][DECISION_CELL.get_y()].set_down(false);
-   	   			cells[rand_front_cell.get_x()][rand_front_cell.get_y()].set_up(false);
-   	   			
+   	   			cells[rand_front_cell.get_x()][rand_front_cell.get_y()].set_up(false);		
    	   		//Up
    	   		}else{
    	   			cells[DECISION_CELL.get_x()][DECISION_CELL.get_y()].set_up(false);
-   	   			cells[rand_front_cell.get_x()][rand_front_cell.get_y()].set_down(false);
-   	   			
+   	   			cells[rand_front_cell.get_x()][rand_front_cell.get_y()].set_down(false);	
    	   		}
    	   		
    	   		cells[rand_front_cell.get_x()][rand_front_cell.get_y()].set_marked(true);
-   	   		//rand_front_cell.set_marked(true);
    	   		DECISION_CELL = rand_front_cell ;
+   	   		
    		}else{
    			if (stack.isEmpty() == false){
    	   			DECISION_CELL = stack.pop() ;
    			}
    		}
+   		
+   		
    	}
    
    	private boolean is_unvisited_cells(){

@@ -15,14 +15,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
-
 public class Creator extends JFrame implements ActionListener{
 
     private myJpanel thePanel ;
 	
 	private static int CELL_WIDTH = 50 ;
-	private static int GRID_WIDTH_SIZE = 10 ; 
-	private static int GRID_HEIGHT_SIZE = 10 ; 	
+	private static int GRID_WIDTH_SIZE = 3 ; 
+	private static int GRID_HEIGHT_SIZE = 3 ; 	
+	private static int COUNTER = 0 ;
+	private static int LONGEST_COUNTER = 0 ;
 	
 	private static int FRAME_BUFFER = 20 ; 
 
@@ -31,7 +32,8 @@ public class Creator extends JFrame implements ActionListener{
 	private Cell DECISION_CELL ;
 	private Cell START_CELL ; 
 	private Cell END_CELL ;
-	
+	private Cell FINISH_LINE_CELL ;
+		
 	private Deque<Cell> stack ;
 
 	private Timer myTimer ;
@@ -135,7 +137,17 @@ public class Creator extends JFrame implements ActionListener{
     	
     	//Draw End
     	if( END_CELL != null ){
-        	g.fillRect(END_CELL.get_x_coordinate() + 2, END_CELL.get_y_coordinate() + 2, reduced_width, reduced_width);
+        	g.setColor(Color.white);
+    		g.fillRect(END_CELL.get_x_coordinate() + 2, END_CELL.get_y_coordinate() + 2, reduced_width, reduced_width);
+        	clearVisited() ;
+        	findEndCell(START_CELL) ;
+    	}
+    	
+    	//Draw Finish Line
+    	if( FINISH_LINE_CELL != null ){
+    		System.out.println("Drawing Finish line.");
+    		g.setColor(Color.RED);
+    		g.fillRect(FINISH_LINE_CELL.get_x_coordinate() + 2, FINISH_LINE_CELL.get_y_coordinate() + 2, reduced_width, reduced_width);
     	}
     	
     }
@@ -149,6 +161,7 @@ public class Creator extends JFrame implements ActionListener{
  				myTimer.stop();
  			    END_CELL = new Cell (DECISION_CELL.get_x_coordinate(), DECISION_CELL.get_y_coordinate()) ;
  			    DECISION_CELL = null ;
+ 			    repaint();
  			}
  		}
  	} 
@@ -220,8 +233,6 @@ public class Creator extends JFrame implements ActionListener{
    	   			DECISION_CELL = stack.pop() ;
    			}
    		}
-   		
-   		
    	}
    
    	private boolean is_unvisited_cells(){
@@ -235,6 +246,63 @@ public class Creator extends JFrame implements ActionListener{
    		}
    		
    		return b ;
+   	}
+   	
+   	public void findEndCell( Cell curr ){
+   	
+   		int count = 0 ;
+   		if ( curr.get_left() == false )
+   			count++ ;
+   		if ( curr.get_right() == false )
+   			count++ ;
+   		if ( curr.get_down() == false )
+   			count++ ;
+   		if ( curr.get_up() == false )
+   			count++ ;
+   		
+   		//End of the path
+   		if ( count == 3 ){
+   			if ( COUNTER > LONGEST_COUNTER ){
+   				LONGEST_COUNTER = COUNTER ;
+   				FINISH_LINE_CELL = curr ;
+   				COUNTER = 0;
+   			}
+   			
+   			//Left
+   			if ( curr.get_left()==false && !cells[ curr.get_x()-1 ][ curr.get_y() ].is_marked() )
+   				stack.push(cells[curr.get_x()][curr.get_y()]);
+   			//Right
+   			if ( curr.get_right()==false && !cells[ curr.get_x()+1 ][ curr.get_y() ].is_marked() )
+   				stack.push(cells[curr.get_x()][curr.get_y()]);
+   			//Down
+   			if ( curr.get_up()==false && !cells[ curr.get_x() ][ curr.get_y()+1 ].is_marked() )
+   				stack.push(cells[curr.get_x()][curr.get_y()]);
+   			//Up
+   			if ( curr.get_down()==false && !cells[ curr.get_x()-1 ][ curr.get_y()-1 ].is_marked() )
+   				stack.push(cells[curr.get_x()][curr.get_y()]);
+   			
+   			if ( !stack.isEmpty() ){
+   				
+   				COUNTER++ ; 
+   				findEndCell( stack.pop() ) ;
+   				
+   			}
+   			
+   			repaint() ;
+   		}
+   			
+   		
+   	}
+   	
+   	public void clearVisited(){
+   		//Clear stack.
+   		stack.clear() ; 
+   		//Clear the marked flags.
+   		for (int i=0; i<GRID_WIDTH_SIZE; i++){
+   			for (int j=0; j<GRID_HEIGHT_SIZE; j++){
+   				cells[i][j].set_marked(false);
+   			}
+   		}
    	}
  	
     public static void main(String[] args) {

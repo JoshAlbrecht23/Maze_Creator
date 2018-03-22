@@ -20,15 +20,17 @@ public class Creator extends JFrame implements ActionListener{
     private myJpanel thePanel ;
 	
 	private static int CELL_WIDTH = 50 ;
-	private static int GRID_WIDTH_SIZE = 3 ; 
-	private static int GRID_HEIGHT_SIZE = 3 ; 	
+	private static int GRID_WIDTH_SIZE = 10 ; 
+	private static int GRID_HEIGHT_SIZE = 10 ; 	
+	
 	private static int COUNTER = 0 ;
 	private static int LONGEST_COUNTER = 0 ;
+	private int[][] distFromStart ;
 	
 	private static int FRAME_BUFFER = 20 ; 
 
 	private static Cell[][] cells ; 
-	
+
 	private Cell DECISION_CELL ;
 	private Cell START_CELL ; 
 	private Cell END_CELL ;
@@ -60,7 +62,9 @@ public class Creator extends JFrame implements ActionListener{
         stack = new ArrayDeque<Cell>() ;      
         
         //Initialize grid of cells
-        cells  = new Cell[GRID_WIDTH_SIZE][GRID_HEIGHT_SIZE] ; 
+        cells  = new Cell[GRID_WIDTH_SIZE][GRID_HEIGHT_SIZE] ;
+        distFromStart = new int [GRID_WIDTH_SIZE][GRID_HEIGHT_SIZE] ;
+        
         //Create cells    
         for (int i=0 ; i < GRID_HEIGHT_SIZE ; i++ ){
         	for (int j=0 ; j < GRID_WIDTH_SIZE ; j++ ){
@@ -81,7 +85,9 @@ public class Creator extends JFrame implements ActionListener{
         
         //Init Start Cell
         START_CELL = new Cell(DECISION_CELL.get_x_coordinate(),DECISION_CELL.get_y_coordinate());  
-                
+        START_CELL.set_x(DECISION_CELL.get_x());
+        START_CELL.set_y(DECISION_CELL.get_y());
+
         pack();
         repaint();
         
@@ -137,15 +143,17 @@ public class Creator extends JFrame implements ActionListener{
     	
     	//Draw End
     	if( END_CELL != null ){
-        	g.setColor(Color.white);
+        	
+    		g.setColor(Color.white);
     		g.fillRect(END_CELL.get_x_coordinate() + 2, END_CELL.get_y_coordinate() + 2, reduced_width, reduced_width);
         	clearVisited() ;
-        	findEndCell(START_CELL) ;
+        	fillDistanceGrid(START_CELL);
+        	FINISH_LINE_CELL = getEndCell() ;
+        	
     	}
     	
     	//Draw Finish Line
     	if( FINISH_LINE_CELL != null ){
-    		System.out.println("Drawing Finish line.");
     		g.setColor(Color.RED);
     		g.fillRect(FINISH_LINE_CELL.get_x_coordinate() + 2, FINISH_LINE_CELL.get_y_coordinate() + 2, reduced_width, reduced_width);
     	}
@@ -248,51 +256,49 @@ public class Creator extends JFrame implements ActionListener{
    		return b ;
    	}
    	
-   	public void findEndCell( Cell curr ){
-   	
-   		int count = 0 ;
-   		if ( curr.get_left() == false )
-   			count++ ;
-   		if ( curr.get_right() == false )
-   			count++ ;
-   		if ( curr.get_down() == false )
-   			count++ ;
-   		if ( curr.get_up() == false )
-   			count++ ;
+   	public void fillDistanceGrid( Cell currCell ){
    		
-   		//End of the path
-   		if ( count == 3 ){
-   			if ( COUNTER > LONGEST_COUNTER ){
-   				LONGEST_COUNTER = COUNTER ;
-   				FINISH_LINE_CELL = curr ;
-   				COUNTER = 0;
-   			}
+   		Cell myCell = cells[currCell.get_x()][currCell.get_y()] ;
+   		   		
+   		if( myCell.get_x() ==  START_CELL.get_x() && myCell.get_y() ==  START_CELL.get_y() ){
+   			distFromStart[myCell.get_x()][myCell.get_y()] = 0 ;
+   		}else if( distFromStart[myCell.get_x()][myCell.get_y()] == -1 ){
    			
-   			//Left
-   			if ( curr.get_left()==false && !cells[ curr.get_x()-1 ][ curr.get_y() ].is_marked() )
-   				stack.push(cells[curr.get_x()][curr.get_y()]);
-   			//Right
-   			if ( curr.get_right()==false && !cells[ curr.get_x()+1 ][ curr.get_y() ].is_marked() )
-   				stack.push(cells[curr.get_x()][curr.get_y()]);
-   			//Down
-   			if ( curr.get_up()==false && !cells[ curr.get_x() ][ curr.get_y()+1 ].is_marked() )
-   				stack.push(cells[curr.get_x()][curr.get_y()]);
-   			//Up
-   			if ( curr.get_down()==false && !cells[ curr.get_x()-1 ][ curr.get_y()-1 ].is_marked() )
-   				stack.push(cells[curr.get_x()][curr.get_y()]);
+   			COUNTER++;
+   			distFromStart[myCell.get_x()][myCell.get_y()] = COUNTER ;
+   		}else{
+   			COUNTER = distFromStart[myCell.get_x()][myCell.get_y()] ;
+   		}
+   		
+   		
+   		if ( myCell.get_left() == false ){
+   			if (distFromStart[myCell.get_x() - 1][myCell.get_y()] == -1)
+   				stack.push(cells[myCell.get_x() - 1][myCell.get_y()]);
+   		}
    			
-   			if ( !stack.isEmpty() ){
+   		if ( myCell.get_right() == false ){
+   			if ( distFromStart[myCell.get_x() + 1][myCell.get_y()] == -1 )
+   				stack.push(cells[myCell.get_x() + 1][myCell.get_y()]);
+   		}
+   		
+   		if ( myCell.get_down() == false ){
+   			if ( distFromStart[myCell.get_x()][myCell.get_y() + 1] == -1 )
+   				stack.push(cells[myCell.get_x()][myCell.get_y() + 1]);
+   		}
    				
-   				COUNTER++ ; 
-   				findEndCell( stack.pop() ) ;
-   				
-   			}
+   		if ( myCell.get_up() == false ){
+   			if (distFromStart[myCell.get_x()][myCell.get_y() -1] == -1)
+   				stack.push(cells[myCell.get_x()][myCell.get_y() - 1]);
+   		}
    			
-   			repaint() ;
+   		if ( stack.isEmpty() == false ){
+   			Cell temp = stack.pop() ;
+   			fillDistanceGrid( temp ) ;
    		}
    			
    		
    	}
+   	
    	
    	public void clearVisited(){
    		//Clear stack.
@@ -303,6 +309,30 @@ public class Creator extends JFrame implements ActionListener{
    				cells[i][j].set_marked(false);
    			}
    		}
+   		//Fill the distance grid with -1
+   		for (int i=0; i<GRID_WIDTH_SIZE; i++){
+   			for (int j=0; j<GRID_HEIGHT_SIZE; j++){
+   				distFromStart[i][j] = -1 ;
+   			}
+   		}
+   	}
+   	
+   	public Cell getEndCell(){
+   		
+   		Cell lastCell = null ;
+   		
+   		for ( int i=0; i<GRID_WIDTH_SIZE; i++ ){
+   			for (int j=0; j<GRID_HEIGHT_SIZE; j++){
+   				if ( lastCell == null ){
+   					lastCell = cells[i][j];
+   				}else{
+   					if ( distFromStart[i][j] > distFromStart[lastCell.get_x()][lastCell.get_y()] )
+   						lastCell = cells[i][j] ;
+   				}
+   			}
+   		}
+   		
+   		return lastCell ;
    	}
  	
     public static void main(String[] args) {

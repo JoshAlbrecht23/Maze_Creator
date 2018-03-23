@@ -20,8 +20,8 @@ public class Creator extends JFrame implements ActionListener{
     private myJpanel thePanel ;
 	
 	private static int CELL_WIDTH = 50 ;
-	private static int GRID_WIDTH_SIZE = 10 ; 
-	private static int GRID_HEIGHT_SIZE = 10 ; 	
+	private static int GRID_WIDTH_SIZE = 5 ; 
+	private static int GRID_HEIGHT_SIZE = 5 ; 	
 	
 	private static int COUNTER = 0 ;
 	private static int LONGEST_COUNTER = 0 ;
@@ -293,12 +293,44 @@ public class Creator extends JFrame implements ActionListener{
    			
    		if ( stack.isEmpty() == false ){
    			Cell temp = stack.pop() ;
+   			//Get new current count
+   			COUNTER = getNewInt(temp);
    			fillDistanceGrid( temp ) ;
    		}
-   			
-   		
    	}
    	
+   	public int getNewInt(Cell curr){
+   		int newCount = 0 ;
+   		int x = curr.get_x();
+   		int y = curr.get_y();
+   		
+   		/* Returns the cell's count based on the neighbor's count. */
+   		
+   		if ( distFromStart[x][y] == COUNTER )
+   			return COUNTER ;
+   		
+   		if ( curr.get_left() == false ){
+   			if (distFromStart[curr.get_x() - 1][curr.get_y()] != -1)
+   				newCount = distFromStart[curr.get_x() - 1][curr.get_y()] ;
+   		}
+   			
+   		if ( curr.get_right() == false ){
+   			if ( distFromStart[curr.get_x() + 1][curr.get_y()] != -1 )
+   				newCount = distFromStart[curr.get_x() + 1][curr.get_y()] ;
+   		}
+   		
+   		if ( curr.get_down() == false ){
+   			if ( distFromStart[curr.get_x()][curr.get_y() + 1] != -1 )
+   				newCount = distFromStart[curr.get_x()][curr.get_y() + 1] ;
+   		}
+   				
+   		if ( curr.get_up() == false ){
+   			if (distFromStart[curr.get_x()][curr.get_y() -1] != -1)
+   				newCount = distFromStart[curr.get_x()][curr.get_y() -1] ;
+   		}
+   		
+   		return newCount ;
+   	}
    	
    	public void clearVisited(){
    		//Clear stack.
@@ -323,6 +355,7 @@ public class Creator extends JFrame implements ActionListener{
    		
    		for ( int i=0; i<GRID_WIDTH_SIZE; i++ ){
    			for (int j=0; j<GRID_HEIGHT_SIZE; j++){
+   				   				
    				if ( lastCell == null ){
    					lastCell = cells[i][j];
    				}else{
